@@ -1,9 +1,9 @@
 package router
 
 import (
-	"app_demo/controller/index"
-	"app_demo/controller/information"
-	"app_demo/controller/page"
+	"api_demo/controller/index"
+	"api_demo/controller/information"
+	"api_demo/controller/page"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

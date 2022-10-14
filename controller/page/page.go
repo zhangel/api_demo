@@ -1,7 +1,7 @@
 package page
 
 import (
-	"app_demo/common"
+	"api_demo/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

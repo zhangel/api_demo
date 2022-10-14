@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"app_demo/common"
-	"app_demo/model"
+	"api_demo/common"
+	"api_demo/model"
 	"fmt"
 )
 

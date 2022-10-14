@@ -1,8 +1,8 @@
 package information
 
 import (
-	"app_demo/common"
-	"app_demo/dao"
+	"api_demo/common"
+	"api_demo/dao"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"

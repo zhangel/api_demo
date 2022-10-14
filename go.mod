@@ -1,4 +1,4 @@
-module app_demo
+module api_demo
 
 go 1.16
 

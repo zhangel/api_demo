@@ -1,9 +1,10 @@
 package common
 
 import (
-	"app_demo/utils/config"
-	"app_demo/utils/mysql"
+	"api_demo/utils/config"
+	"api_demo/utils/mysql"
 )
+
 var MySQL *mysql.MySQL
 
 func RegistryDB() {
