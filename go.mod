@@ -3,6 +3,7 @@ module api_demo
 go 1.16
 
 require (
+	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-ini/ini v1.67.0
 	github.com/wonderivan/logger v1.0.0
