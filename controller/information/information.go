@@ -14,7 +14,7 @@ type InformationController struct {
 }
 
 func (i InformationController) Get(c *gin.Context) {
-	searchMap := map[string]string{}
+	searchMap := map[string]interface{}{}
 	limitNum := 25
 	var err error
 	limit := c.Query("limit")
@@ -42,7 +42,11 @@ func (i InformationController) Get(c *gin.Context) {
 	}
 	level := c.Query("level")
 	if level != "" {
-		searchMap["level"] = level
+		levelInt, err := strconv.Atoi(level)
+		if err != nil {
+			logger.Error("convert page to int fail,error=%+v", err)
+		}
+		searchMap["level"] = levelInt
 	}
 	dataList := i.Dao.GetDataList(pageNum, limitNum, searchMap)
 	common.Json(http.StatusOK, "OK", dataList, c)

@@ -8,3 +8,7 @@ type SampleInfo struct {
 	Operator   string `gorm:"column:operator" json:"operator"`
 	CreateTime string `gorm:"column:create_time" json:"create_time"`
 }
+
+func (s *SampleInfo) TableName() string {
+	return "sample_info"
+}

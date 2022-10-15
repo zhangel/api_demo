@@ -3,7 +3,9 @@ package dao
 import (
 	"api_demo/common"
 	"api_demo/model"
+	"api_demo/utils/sql_parse"
 	"fmt"
+	"github.com/wonderivan/logger"
 )
 
 type InformationDao struct {
@@ -13,44 +15,57 @@ var (
 	Table string = "sample_info"
 )
 
-func (i *InformationDao) GetDataList(page, limit int, search map[string]string) []model.SampleInfo {
+func (i *InformationDao) GetDataList(page, limit int, search map[string]interface{}) []model.SampleInfo {
 	dataList := []model.SampleInfo{}
 	offset := (page - 1) * limit
-	db := common.MySQL.DB.Table(Table).Offset(offset).Limit(limit)
+	sqlParse := sql_parse.NewSqlParse()
+	sqlDB := sqlParse.Table(Table)
 	for k, v := range search {
-		db.Where(fmt.Sprintf("%s=?", k), v)
+		sqlDB = sqlDB.Where(k+"=", fmt.Sprintf("'%v'", v))
 	}
-	db.Find(&dataList)
+	sqlDB = sqlDB.Limit(limit).Offset(offset)
+	sql := sqlDB.Get()
+	common.MySQL.DB.Raw(sql).Debug().Scan(&dataList)
 	return dataList
 }
 
 func (i *InformationDao) Insert(insertMap map[string]interface{}) error {
 	var count int64
-	common.MySQL.DB.Table(Table).Where("md5=?", insertMap["md5"]).Count(&count)
+	sqlParse := sql_parse.NewSqlParse()
+	countSql := sqlParse.Table(Table).Where("md5=", fmt.Sprintf("'%s'", insertMap["md5"].(string))).Count()
+	common.MySQL.DB.Raw(countSql).Debug().Scan(&count)
 	if count > 0 {
 		return fmt.Errorf("md5 %s already exists", insertMap["md5"])
 	}
-	common.MySQL.DB.Table(Table).Create(insertMap)
+	insertSql := sqlParse.Table(Table).Insert(insertMap)
+	common.MySQL.DB.Exec(insertSql)
 	return nil
 }
 
 func (i *InformationDao) Update(updateMap map[string]interface{}) error {
 	var count int64
-	common.MySQL.DB.Table(Table).Where("id=?", updateMap["id"]).Count(&count)
+	sqlParse := sql_parse.NewSqlParse()
+	countSql := sqlParse.Table(Table).Where("id=", fmt.Sprintf("'%s'", updateMap["id"])).Count()
+	common.MySQL.DB.Raw(countSql).Scan(&count)
 	if count == 0 {
 		return fmt.Errorf("id %s not exists", updateMap["id"])
 	}
-	common.MySQL.DB.Table(Table).Where(fmt.Sprintf("%s=?", "id"), updateMap["id"]).Updates(updateMap)
+	updateSql := sqlParse.Table(Table).Where("id=", updateMap["id"].(string)).Update(updateMap)
+	logger.Debug("sql: %s", updateSql)
+	common.MySQL.DB.Exec(updateSql)
 	return nil
 }
 
 func (i *InformationDao) Delete(id string) error {
 	var count int64
-	common.MySQL.DB.Table(Table).Where("id=?", id).Count(&count)
+	sqlParse := sql_parse.NewSqlParse()
+	countSql := sqlParse.Table(Table).Where("id=", sqlParse.WrapCharacter(id)).Count()
+	common.MySQL.DB.Raw(countSql).Scan(&count)
 	if count == 0 {
 		return fmt.Errorf("id %s not exists", id)
 	}
-	var sample model.SampleInfo
-	common.MySQL.DB.Table(Table).Where("id=?", id).Delete(&sample)
+	delSql := sqlParse.Table(Table).Where("id=", id).Delete()
+	logger.Debug("sql: %s", delSql)
+	common.MySQL.DB.Exec(delSql)
 	return nil
 }
