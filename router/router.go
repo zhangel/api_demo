@@ -5,7 +5,6 @@ import (
 	"api_demo/controller/information"
 	"api_demo/controller/page"
 	"api_demo/controller/user"
-	"api_demo/middleware"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -22,7 +21,7 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Recovery())
 	store := cookie.NewStore([]byte("cookie_secret"))
 	router.Use(sessions.Sessions("gin_session", store))
-	router.Use(middleware.Session{}.Check)
+	//router.Use(middleware.Session{}.Check)
 
 	router.GET("/", index.IndexController{}.Index)
 
