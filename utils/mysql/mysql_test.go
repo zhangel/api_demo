@@ -1,9 +1,9 @@
 package mysql
 
 import (
-	"api_demo/utils/config"
 	"github.com/wonderivan/logger"
 	"testing"
+	"tip/utils/config"
 )
 
 func Test_MySQL(t *testing.T) {

@@ -1,8 +1,8 @@
 package index
 
 import (
-	"api_demo/common"
 	"github.com/gin-gonic/gin"
+	"tip/common"
 )
 
 type IndexController struct {

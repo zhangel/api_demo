@@ -1,11 +1,11 @@
 package dao
 
 import (
-	"api_demo/common"
-	"api_demo/model"
-	"api_demo/utils/sql_parse"
 	"fmt"
 	"github.com/wonderivan/logger"
+	"tip/common"
+	"tip/model"
+	"tip/utils/sql_parse"
 )
 
 type InformationDao struct {

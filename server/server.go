@@ -1,9 +1,9 @@
 package server
 
 import (
-	"api_demo/common"
-	"api_demo/router"
-	"api_demo/utils/config"
+	"tip/common"
+	"tip/router"
+	"tip/utils/config"
 )
 
 func ServeRun() {

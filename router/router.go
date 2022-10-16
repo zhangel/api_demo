@@ -1,15 +1,15 @@
 package router
 
 import (
-	"api_demo/controller/index"
-	"api_demo/controller/information"
-	"api_demo/controller/page"
-	"api_demo/controller/user"
-	"api_demo/middleware"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"tip/controller/index"
+	"tip/controller/information"
+	"tip/controller/page"
+	"tip/controller/user"
+	"tip/middleware"
 )
 
 func NewRouter() *gin.Engine {

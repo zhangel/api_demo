@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"api_demo/common"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"
 	"strings"
+	"tip/common"
 )
 
 type Session struct {

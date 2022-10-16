@@ -1,9 +1,9 @@
 package page
 
 import (
-	"api_demo/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"tip/common"
 )
 
 type Page struct {

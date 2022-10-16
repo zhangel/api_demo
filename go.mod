@@ -1,4 +1,4 @@
-module api_demo
+module tip
 
 go 1.16
 

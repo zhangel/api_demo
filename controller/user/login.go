@@ -1,12 +1,12 @@
 package user
 
 import (
-	"api_demo/common"
-	"api_demo/middleware"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"
+	"tip/common"
+	"tip/middleware"
 )
 
 type Login struct {

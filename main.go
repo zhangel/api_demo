@@ -1,6 +1,6 @@
 package main
 
-import "api_demo/server"
+import "tip/server"
 
 func main() {
 	server.ServeRun()

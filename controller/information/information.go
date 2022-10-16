@@ -1,12 +1,12 @@
 package information
 
 import (
-	"api_demo/common"
-	"api_demo/dao"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"
 	"strconv"
+	"tip/common"
+	"tip/dao"
 )
 
 type InformationController struct {

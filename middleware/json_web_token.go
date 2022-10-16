@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"api_demo/common"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 	"time"
+	"tip/common"
 )
 
 var (
