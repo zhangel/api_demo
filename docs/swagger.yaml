@@ -1,0 +1,28 @@
+info:
+  contact: {}
+paths:
+  /api/v1/information/sample/delete:
+    post:
+      responses: {}
+      summary: 删除样本列表数据
+      tags:
+      - 标签
+  /api/v1/information/sample/get:
+    get:
+      responses: {}
+      summary: 获取样本列表数据
+      tags:
+      - 标签
+  /api/v1/information/sample/insert:
+    post:
+      responses: {}
+      summary: 新增样本信息
+      tags:
+      - 标签
+  /api/v1/information/sample/update:
+    get:
+      responses: {}
+      summary: 更新样本信息
+      tags:
+      - 标签
+swagger: "2.0"

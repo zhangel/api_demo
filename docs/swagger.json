@@ -1,0 +1,44 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/information/sample/delete": {
+            "post": {
+                "tags": [
+                    "标签"
+                ],
+                "summary": "删除样本列表数据",
+                "responses": {}
+            }
+        },
+        "/api/v1/information/sample/get": {
+            "get": {
+                "tags": [
+                    "标签"
+                ],
+                "summary": "获取样本列表数据",
+                "responses": {}
+            }
+        },
+        "/api/v1/information/sample/insert": {
+            "post": {
+                "tags": [
+                    "标签"
+                ],
+                "summary": "新增样本信息",
+                "responses": {}
+            }
+        },
+        "/api/v1/information/sample/update": {
+            "get": {
+                "tags": [
+                    "标签"
+                ],
+                "summary": "更新样本信息",
+                "responses": {}
+            }
+        }
+    }
+}

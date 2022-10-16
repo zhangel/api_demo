@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	noneAuth   = []string{"login", "logout", "token"}
+	noneAuth   = []string{"login", "logout", "token", "swagger", "docs", "favicon.ico"}
 	jwtSecret  = []byte("123")
 	expireTime = 3600 //second
 )

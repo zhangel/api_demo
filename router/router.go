@@ -4,17 +4,19 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"tip/controller/index"
 	"tip/controller/information"
 	"tip/controller/page"
 	"tip/controller/user"
+	"tip/docs"
 	"tip/middleware"
 )
 
 func NewRouter() *gin.Engine {
 	router := gin.Default()
-	router.StaticFS("static", http.Dir("static"))
+	//router.StaticFS("static", http.Dir("static"))
 
 	router.NoRoute(func(context *gin.Context) {
 		page.Page{}.Page404(context)
@@ -28,6 +30,8 @@ func NewRouter() *gin.Engine {
 
 	v1 := router.Group("/api/v1")
 	{
+		docs.SwaggerInfo.BasePath = "api/v1/docs/doc.json"
+		v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		v1.POST("login", user.Login{}.Login)
 		v1.POST("logout", user.Login{}.Logout)
 		v1.GET("token", user.Login{}.GenerateToken)

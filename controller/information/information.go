@@ -13,6 +13,9 @@ type InformationController struct {
 	Dao *dao.InformationDao
 }
 
+// @Summary 获取样本列表数据
+// @Tags 标签
+// @Router /api/v1/information/sample/get [get]
 func (i InformationController) Get(c *gin.Context) {
 	searchMap := map[string]interface{}{}
 	limitNum := 25
@@ -52,6 +55,9 @@ func (i InformationController) Get(c *gin.Context) {
 	common.Json(http.StatusOK, "OK", dataList, c)
 }
 
+// @Summary 新增样本信息
+// @Tags 标签
+// @Router /api/v1/information/sample/insert [post]
 func (i InformationController) Insert(c *gin.Context) {
 	md5 := c.PostForm("md5")
 	if common.CheckArgs(md5, "md5", c) {
@@ -78,6 +84,9 @@ func (i InformationController) Insert(c *gin.Context) {
 	common.Json(http.StatusOK, "OK", true, c)
 }
 
+// @Summary 更新样本信息
+// @Tags 标签
+// @Router /api/v1/information/sample/update [get]
 func (i InformationController) Update(c *gin.Context) {
 	updateMap := map[string]interface{}{}
 	id := c.PostForm("id")
@@ -98,6 +107,9 @@ func (i InformationController) Update(c *gin.Context) {
 	common.Json(http.StatusOK, "OK", true, c)
 }
 
+// @Summary 删除样本列表数据
+// @Tags 标签
+// @Router /api/v1/information/sample/delete [post]
 func (i InformationController) Delete(c *gin.Context) {
 	id := c.PostForm("id")
 	if common.CheckArgs(id, "id", c) {
