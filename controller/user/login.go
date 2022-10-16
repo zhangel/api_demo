@@ -2,6 +2,7 @@ package user
 
 import (
 	"api_demo/common"
+	"api_demo/middleware"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
@@ -47,4 +48,16 @@ func (l Login) Logout(c *gin.Context) {
 		session.Save()
 	}
 	common.Json(http.StatusOK, "OK", true, c)
+}
+
+func (l Login) GenerateToken(c *gin.Context) {
+	logger.Debug("GENERATE TOKEN")
+	token, err := middleware.GenerateToken("11")
+	if err != nil {
+		logger.Error("generate token fail,error=%+v", err)
+		common.Json(http.StatusOK, "获取token失败", false, c)
+		return
+	}
+	data := map[string]string{"token": token}
+	common.Json(http.StatusOK, "OK", data, c)
 }

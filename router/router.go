@@ -5,6 +5,7 @@ import (
 	"api_demo/controller/information"
 	"api_demo/controller/page"
 	"api_demo/controller/user"
+	"api_demo/middleware"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -22,14 +23,14 @@ func NewRouter() *gin.Engine {
 	store := cookie.NewStore([]byte("cookie_secret"))
 	router.Use(sessions.Sessions("gin_session", store))
 	//router.Use(middleware.Session{}.Check)
-
+	router.Use(middleware.JWTAuth())
 	router.GET("/", index.IndexController{}.Index)
 
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("login", user.Login{}.Login)
 		v1.POST("logout", user.Login{}.Logout)
-
+		v1.GET("token", user.Login{}.GenerateToken)
 		info := v1.Group("information")
 		info.GET("sample/get", information.InformationController{}.Get)
 		info.POST("sample/insert", information.InformationController{}.Insert)
