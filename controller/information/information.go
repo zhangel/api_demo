@@ -7,14 +7,26 @@ import (
 	"strconv"
 	"tip/common"
 	"tip/dao"
+	_ "tip/model"
 )
 
 type InformationController struct {
 	Dao *dao.InformationDao
 }
 
+// ShowAccount godoc
 // @Summary 获取样本列表数据
 // @Tags 标签
+// @Produce json
+// @Description 获取样本列表数据
+// @Param page query int false "默认为 1"   default(1)
+// @Param limit query int false "默认为 25" default(25)
+// @Param level query int false "默认为 空"
+// @Param token query string false "默认为 空"
+// @Param md5 query string false "默认为 空"
+// @Param sha1 query string false "默认为 空"
+// @Success  200 {object}  model.JsonOut{data=[]model.SampleInfo}
+// @Failure  500 {object}  model.ServerError
 // @Router /api/v1/information/sample/get [get]
 func (i InformationController) Get(c *gin.Context) {
 	searchMap := map[string]interface{}{}
@@ -57,6 +69,15 @@ func (i InformationController) Get(c *gin.Context) {
 
 // @Summary 新增样本信息
 // @Tags 标签
+// @Produce json
+// @Description 新增样本数据
+// @Param level formData int true "默认为 空" default(70)
+// @Param md5 formData string true "默认为 空" default(2a57220fe8f64481b1311c892b788da5)
+// @Param sha1 formData string true "默认为 空" default(ff4cd7d8ee07f35037e834cc0f356f5fa159c871)
+// @Param operator formData string false "默认为 空" default(admin)
+// @Param token formData string false "默认为 空"
+// @Success  200 {object}  model.ExecSuccess
+// @Failure  500 {object}  model.ServerError
 // @Router /api/v1/information/sample/insert [post]
 func (i InformationController) Insert(c *gin.Context) {
 	md5 := c.PostForm("md5")
@@ -86,7 +107,14 @@ func (i InformationController) Insert(c *gin.Context) {
 
 // @Summary 更新样本信息
 // @Tags 标签
-// @Router /api/v1/information/sample/update [get]
+// @Produce json
+// @Description 更新样本数据
+// @Param level formData int true "默认为 空" default(0)
+// @Param id formData int true "默认为 空" default(0)
+// @Param token formData int true "默认为 空"
+// @Success  200 {object}  model.ExecSuccess
+// @Failure  500 {object}  model.ServerError
+// @Router /api/v1/information/sample/update [post]
 func (i InformationController) Update(c *gin.Context) {
 	updateMap := map[string]interface{}{}
 	id := c.PostForm("id")
@@ -107,8 +135,14 @@ func (i InformationController) Update(c *gin.Context) {
 	common.Json(http.StatusOK, "OK", true, c)
 }
 
-// @Summary 删除样本列表数据
+// @Summary 删除样本列表
 // @Tags 标签
+// @Produce json
+// @Description 删除样本数据
+// @Param level body int true "默认为 空" default(0)
+// @Param token formData int true "默认为 空"
+// @Success  200 {object}  model.ExecSuccess
+// @Failure  500 {object}  model.ServerError
 // @Router /api/v1/information/sample/delete [post]
 func (i InformationController) Delete(c *gin.Context) {
 	id := c.PostForm("id")

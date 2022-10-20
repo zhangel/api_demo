@@ -1,27 +1,220 @@
+definitions:
+  model.ExecSuccess:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data:
+        example: true
+        type: boolean
+      message:
+        example: OK
+        type: string
+    type: object
+  model.JsonOut:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data: {}
+      message:
+        example: OK
+        type: string
+    type: object
+  model.SampleInfo:
+    properties:
+      create_time:
+        example: "2022-10-20 11:00:01"
+        type: string
+      id:
+        example: 1
+        type: integer
+      level:
+        example: 70
+        type: integer
+      md5:
+        example: 2a57220fe8f64481b1311c892b788da5
+        type: string
+      operator:
+        example: admin
+        type: string
+      sha1:
+        example: ff4cd7d8ee07f35037e834cc0f356f5fa159c871
+        type: string
+    type: object
+  model.ServerError:
+    properties:
+      code:
+        example: 500
+        type: integer
+      data:
+        example: false
+        type: boolean
+      message:
+        example: 服务器内部错误
+        type: string
+    type: object
 info:
   contact: {}
 paths:
   /api/v1/information/sample/delete:
     post:
-      responses: {}
-      summary: 删除样本列表数据
+      description: 删除样本数据
+      parameters:
+      - default: 0
+        description: 默认为 空
+        in: body
+        name: level
+        required: true
+        schema:
+          type: integer
+      - description: 默认为 空
+        in: formData
+        name: token
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ExecSuccess'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
+      summary: 删除样本列表
       tags:
       - 标签
   /api/v1/information/sample/get:
     get:
-      responses: {}
+      description: 获取样本列表数据
+      parameters:
+      - default: 1
+        description: 默认为 1
+        in: query
+        name: page
+        type: integer
+      - default: 25
+        description: 默认为 25
+        in: query
+        name: limit
+        type: integer
+      - description: 默认为 空
+        in: query
+        name: level
+        type: integer
+      - description: 默认为 空
+        in: query
+        name: token
+        type: string
+      - description: 默认为 空
+        in: query
+        name: md5
+        type: string
+      - description: 默认为 空
+        in: query
+        name: sha1
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.JsonOut'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.SampleInfo'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
       summary: 获取样本列表数据
       tags:
       - 标签
   /api/v1/information/sample/insert:
     post:
-      responses: {}
+      description: 新增样本数据
+      parameters:
+      - default: 70
+        description: 默认为 空
+        in: formData
+        name: level
+        required: true
+        type: integer
+      - default: 2a57220fe8f64481b1311c892b788da5
+        description: 默认为 空
+        in: formData
+        name: md5
+        required: true
+        type: string
+      - default: ff4cd7d8ee07f35037e834cc0f356f5fa159c871
+        description: 默认为 空
+        in: formData
+        name: sha1
+        required: true
+        type: string
+      - default: admin
+        description: 默认为 空
+        in: formData
+        name: operator
+        type: string
+      - description: 默认为 空
+        in: formData
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ExecSuccess'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
       summary: 新增样本信息
       tags:
       - 标签
   /api/v1/information/sample/update:
     get:
-      responses: {}
+      description: 更新样本数据
+      parameters:
+      - default: 0
+        description: 默认为 空
+        in: formData
+        name: level
+        required: true
+        type: integer
+      - default: 0
+        description: 默认为 空
+        in: formData
+        name: id
+        required: true
+        type: integer
+      - description: 默认为 空
+        in: formData
+        name: token
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ExecSuccess'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
       summary: 更新样本信息
       tags:
       - 标签

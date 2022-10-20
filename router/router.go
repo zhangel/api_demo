@@ -30,7 +30,7 @@ func NewRouter() *gin.Engine {
 
 	v1 := router.Group("/api/v1")
 	{
-		docs.SwaggerInfo.BasePath = "api/v1/docs/doc.json"
+		docs.SwaggerInfo.BasePath = "/api/v1/docs/doc.json"
 		v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		v1.POST("login", user.Login{}.Login)
 		v1.POST("logout", user.Login{}.Logout)
