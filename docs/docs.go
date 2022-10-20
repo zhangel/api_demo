@@ -208,7 +208,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/information/sample/update": {
-            "get": {
+            "post": {
                 "description": "更新样本数据",
                 "produces": [
                     "application/json"

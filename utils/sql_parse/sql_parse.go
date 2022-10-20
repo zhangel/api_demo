@@ -12,6 +12,7 @@ type SqlParse struct {
 	where  []string
 	table  string
 	fields []string
+	join   string
 }
 
 var (
@@ -43,6 +44,11 @@ func (s *SqlParse) Offset(offset int) *SqlParse {
 
 func (s *SqlParse) Select(fields []string) *SqlParse {
 	s.fields = fields
+	return s
+}
+
+func (s *SqlParse) Join(join string) *SqlParse {
+	s.join = join
 	return s
 }
 
@@ -86,6 +92,13 @@ func (s *SqlParse) getLimit() string {
 	return limit
 }
 
+func (s *SqlParse) getJoin() string {
+	if s.join != "" {
+		return s.join
+	}
+	return ""
+}
+
 func (s *SqlParse) WrapCharacter(v interface{}) string {
 	switch v.(type) {
 	case string:
@@ -103,6 +116,7 @@ func (s *SqlParse) parseSql(sqlType string, value ...interface{}) string {
 	switch sqlType {
 	case "GET":
 		sql += fmt.Sprintf("SELECT %s FROM %s ", s.getFields(), s.table)
+		sql += s.getJoin()
 		sql += s.getWhere()
 		sql += s.getLimit()
 		return sql
