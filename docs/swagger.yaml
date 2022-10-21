@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   model.ExecSuccess:
     properties:
@@ -54,20 +55,29 @@ definitions:
         example: 服务器内部错误
         type: string
     type: object
+host: http://127.0.0.1:8080
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: Cameron
+    url: http://www.swagger.io/support
+  description: 应用系统接口基于Golang Gin框架开发，Gin是一个非常受欢迎的Golang Web框架，在GitHub上已经有47k的星星，后续开发可以参考官方手册,https://gin-gonic.com/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://127.0.0.1:8080/api/v1/token
+  title: 应用系统接口服务
+  version: "1.0"
 paths:
   /api/v1/information/sample/delete:
     post:
       description: 删除样本数据
       parameters:
-      - default: 0
-        description: 默认为 空
-        in: body
-        name: level
+      - description: 默认为 空
+        in: formData
+        name: id
         required: true
-        schema:
-          type: integer
+        type: string
       - description: 默认为 空
         in: formData
         name: token

@@ -10,7 +10,16 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://127.0.0.1:8080/api/v1/token",
+        "contact": {
+            "name": "Cameron",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -28,14 +37,11 @@ const docTemplate = `{
                 "summary": "删除样本列表",
                 "parameters": [
                     {
-                        "default": 0,
+                        "type": "string",
                         "description": "默认为 空",
-                        "name": "level",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "integer",
@@ -342,12 +348,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "http://127.0.0.1:8080",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "应用系统接口服务",
+	Description:      "应用系统接口基于Golang Gin框架开发，Gin是一个非常受欢迎的Golang Web框架，在GitHub上已经有47k的星星，后续开发可以参考官方手册,https://gin-gonic.com/",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

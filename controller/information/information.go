@@ -139,7 +139,7 @@ func (i InformationController) Update(c *gin.Context) {
 // @Tags 标签
 // @Produce json
 // @Description 删除样本数据
-// @Param level body int true "默认为 空" default(0)
+// @Param id formData string true "默认为 空"
 // @Param token formData int true "默认为 空"
 // @Success  200 {object}  model.ExecSuccess
 // @Failure  500 {object}  model.ServerError
