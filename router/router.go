@@ -27,7 +27,7 @@ func NewRouter() *gin.Engine {
 	//router.Use(middleware.Session{}.Check)
 	router.Use(middleware.JWTAuth())
 	router.GET("/", index.IndexController{}.Index)
-	docs.SwaggerInfo.BasePath = "/doc.json"
+	docs.SwaggerInfo.BasePath = ""
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	v1 := router.Group("/api/v1")
 	{

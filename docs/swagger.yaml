@@ -55,7 +55,7 @@ definitions:
         example: 服务器内部错误
         type: string
     type: object
-host: http://127.0.0.1:8080
+host: 127.0.0.1:8080
 info:
   contact:
     email: support@swagger.io
