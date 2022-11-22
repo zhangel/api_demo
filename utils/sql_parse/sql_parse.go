@@ -2,6 +2,7 @@ package sql_parse
 
 import (
 	"fmt"
+	"github.com/wonderivan/logger"
 	"strings"
 	"sync"
 )
@@ -69,6 +70,7 @@ func (s *SqlParse) clean() {
 
 func (s *SqlParse) getFields() string {
 	fields := "*"
+	logger.Info("fields=%+v",s.fields)
 	if len(s.fields) > 0 {
 		fields = strings.Join(s.fields, ",")
 	}

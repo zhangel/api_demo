@@ -63,7 +63,11 @@ func (i InformationController) Get(c *gin.Context) {
 		}
 		searchMap["level"] = levelInt
 	}
-	dataList := i.Dao.GetDataList(pageNum, limitNum, searchMap)
+	dataList,err := i.Dao.GetDataList(pageNum, limitNum, searchMap)
+	if err != nil {
+		common.Json(http.StatusInternalServerError,err.Error(),false,c)
+		return
+	}
 	common.Json(http.StatusOK, "OK", dataList, c)
 }
 

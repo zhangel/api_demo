@@ -15,3 +15,16 @@ CREATE TABLE sample_info(
 INSERT INTO sample_info(`md5`,`sha1`,`level`,`operator`)VALUES("c253201e6ac8857e24b838d781c81099","068b987d3a102a69c1b8377a54c3bc7bd2a1287c",70,"admin");
 INSERT INTO sample_info(`md5`,`sha1`,`level`,`operator`)VALUES("dc61f178f6e846e32cb65328c549e5a8","fec0ec0c1814703675680bf2e34dc3d14630cba0",70,"admin");
 
+
+CREATE TABLE sample_stat(
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+    `md5` varchar(32) NOT NULL DEFAULT '' COMMENT 'MD5',
+    `sha1` varchar(60) NOT NULL DEFAULT '' COMMENT 'sha1',
+    `md5_number` int(11) NOT NULL DEFAULT 0 COMMENT 'md5_number',
+    `sha1_number` int(11) NOT NULL DEFAULT 0 COMMENT 'sha1_number',
+    `create_time` DATETIME DEFAULT NOW() COMMENT 'create_time',
+    PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8 COMMENT='sample_stat';
+
+INSERT INTO sample_stat(`md5`,`sha1`,`md5_number`,`sha1_number`)VALUES("c253201e6ac8857e24b838d781c81099","068b987d3a102a69c1b8377a54c3bc7bd2a1287c",20,40);
+INSERT INTO sample_stat(`md5`,`sha1`,`md5_number`,`sha1_number`)VALUES("dc61f178f6e846e32cb65328c549e5a8","fec0ec0c1814703675680bf2e34dc3d14630cba0",30,90);

@@ -7,6 +7,9 @@ type SampleInfo struct {
 	Level      int    `gorm:"column:level" json:"level" example:"70"`
 	Operator   string `gorm:"column:operator" json:"operator" example:"admin"`
 	CreateTime string `gorm:"column:create_time" json:"create_time" example:"2022-10-20 11:00:01"`
+	Sha1Number int `gorm:"column:sha1_number" json:"sha1_number" example:"1"`
+	Md5Number  int `gorm:"column:md5_number" json:"md5_number" example:"1"`
+	Md5Sha1Number int `gorm:"column:md5_sha1_number" json:"md5_sha1_number" example:"1"`
 }
 
 func (s *SampleInfo) TableName() string {

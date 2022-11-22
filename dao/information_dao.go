@@ -15,18 +15,23 @@ var (
 	Table string = "sample_info"
 )
 
-func (i *InformationDao) GetDataList(page, limit int, search map[string]interface{}) []model.SampleInfo {
+func (i *InformationDao) GetDataList(page, limit int, search map[string]interface{}) ([]model.SampleInfo,error) {
 	dataList := []model.SampleInfo{}
 	offset := (page - 1) * limit
 	sqlParse := sql_parse.NewSqlParse()
-	sqlDB := sqlParse.Table(Table)
+	sqlDB := sqlParse.Table(Table+" as a")
 	for k, v := range search {
 		sqlDB = sqlDB.Where(k+"=", fmt.Sprintf("'%v'", v))
 	}
+	sqlDB.Select([]string{"a.*","b.sha1_number as sha1_number","b.md5_number as md5_number","(md5_number+sha1_number) as md5_sha1_number"})
+	sqlDB.Join("left join sample_stat as b on a.md5=b.md5 and a.sha1=b.sha1")
 	sqlDB = sqlDB.Limit(limit).Offset(offset)
 	sql := sqlDB.Get()
-	common.MySQL.DB.Raw(sql).Debug().Scan(&dataList)
-	return dataList
+	db:=common.MySQL.DB.Raw(sql).Debug().Scan(&dataList)
+	if db.Error != nil {
+		return dataList,db.Error
+	}
+	return dataList,nil
 }
 
 func (i *InformationDao) Insert(insertMap map[string]interface{}) error {
