@@ -2,7 +2,7 @@ package information
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"net/http"
 	"strconv"
 	"tip/common"

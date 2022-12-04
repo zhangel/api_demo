@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/go-ini/ini"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"os"
 	"path"
 	"strings"

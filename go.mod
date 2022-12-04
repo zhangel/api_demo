@@ -1,6 +1,6 @@
 module tip
 
-go 1.17
+go 1.16
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -12,8 +12,9 @@ require (
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.6
-	github.com/swaggo/swag/example/celler v0.0.0-20221017203159-277a27849f9d
-	github.com/wonderivan/logger v1.0.0
+	github.com/zhangel/gpool v1.0.0
+	github.com/zhangel/logger v0.0.0-20221204083056-1f957f05454d
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
 	golang.org/x/text v0.3.8 // indirect

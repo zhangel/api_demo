@@ -2,7 +2,7 @@ package sql_parse
 
 import (
 	"fmt"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"strings"
 	"sync"
 )

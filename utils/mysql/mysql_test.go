@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"testing"
 	"tip/utils/config"
 )

@@ -2,7 +2,7 @@ package dao
 
 import (
 	"fmt"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"tip/common"
 	"tip/model"
 	"tip/utils/sql_parse"

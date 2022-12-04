@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"net/http"
 	"strings"
 	"tip/common"

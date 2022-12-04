@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/wonderivan/logger"
+	"github.com/zhangel/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
