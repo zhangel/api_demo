@@ -5,6 +5,7 @@ import (
 	"github.com/zhangel/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	dbLogger "gorm.io/gorm/logger"
 	"net/url"
 	"sync"
 )
@@ -44,7 +45,8 @@ func (m *MySQL) Parse() string {
 func (m *MySQL) Init(dbURL string) {
 	m.url = dbURL
 	dsnURL := m.Parse()
-	dbConfig := &gorm.Config{PrepareStmt: false}
+	dbConfig := &gorm.Config{PrepareStmt: false,Logger:dbLogger.Default.LogMode(dbLogger.Silent)}
+
 	db, err := gorm.Open(mysql.Open(dsnURL), dbConfig)
 	if err != nil {
 		logger.Fatal("connection mysql fail,error=%+v,db_url=%s", err, dsnURL)

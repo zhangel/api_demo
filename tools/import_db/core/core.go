@@ -9,6 +9,7 @@ import (
 	"github.com/zhangel/gpool"
 	"gorm.io/gorm"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"tip/tools/import_db/model"
@@ -21,6 +22,8 @@ type Core struct {
 	path string
 	second  int
 	goNum 	int
+	isDir   bool
+	fileList []string
 }
 
 var (
@@ -28,6 +31,7 @@ var (
 	once sync.Once
 	src *string
 	tableName = "vul_infos"
+	fileSuffix = ".xml"
 )
 
 func NewCore(URL string) *Core {
@@ -46,11 +50,16 @@ func (c *Core) createTable() {
 	}
 }
 
+func (c *Core) CheckIsDir() {
+
+}
+
 func (c *Core) init(URL string) {
 	conn :=mysql.NewMySQL(URL)
 	c.DB = conn.DB
 	c.createTable()
 	c.Parse()
+
 }
 
 func (c *Core) Parse() {
@@ -88,13 +97,7 @@ func (c *Core) WriteRecord(item model.Entry) {
 		BugtraqId: item.OtherId.BugtraqId,
 		VulnSolution:item.VulnSolution,
 	}
-	var count int64
-	c.DB.Table(tableName).Where("`cve-id`=?",item.OtherId.CveId).Count(&count)
-	if count == 0 {
-		c.DB.Create(&insert)
-	} else {
-		fmt.Printf("cve-id=%s already exists\n",item.OtherId.CveId)
-	}
+	c.DB.Create(&insert)
 }
 
 func (c *Core) Timer() {
@@ -103,10 +106,10 @@ func (c *Core) Timer() {
 	}
 }
 
-func (c *Core) ParseXml() {
-	respByte,err:=os.ReadFile(c.path)
+func (c *Core) ParseXml(path string) {
+	respByte,err:=os.ReadFile(path)
 	if err != nil {
-		logger.Error("read file %s fail,error=%+v",c.path,err)
+		logger.Error("read file %s fail,error=%+v",path,err)
 		return
 	}
 	respStr:=c.ReplaceXML(respByte)
@@ -115,7 +118,7 @@ func (c *Core) ParseXml() {
 	decoder.Strict=false
 	err=decoder.Decode(&Cnnvd)
 	if err != nil {
-		logger.Error("parse file %s fail,error=%+v",c.path,err)
+		logger.Error("parse file %s fail,error=%+v",path,err)
 		return
 	}
 	g:=gpool.New(c.goNum)
@@ -130,15 +133,52 @@ func (c *Core) ParseXml() {
 	g.Wait()
 }
 
+func (c *Core) ScanDir() {
+	entry,err:=os.ReadDir(c.path)
+	if err != nil {
+		logger.Error("scan dir %s fail,error=%+v",c.path,err)
+		return
+	}
+	if len(entry) ==0 {
+		logger.Error("%s entry is empty",c.path)
+		return
+	}
+	xmlEntry:=make([]string,0)
+	for _,file:=range entry {
+		suffix:=filepath.Ext(file.Name())
+		if !file.IsDir() && suffix == fileSuffix {
+			xmlFile:=filepath.Join(c.path,file.Name())
+			xmlEntry=append(xmlEntry,xmlFile)
+		}
+	}
+	c.fileList = xmlEntry
+}
+
+func (c *Core) importData() {
+	for _,file:=range c.fileList {
+		c.ParseXml(file)
+	}
+}
+
+func (c *Core) ParseDir() {
+	c.ScanDir()
+	c.importData()
+}
+
 func (c *Core) ReadXml() {
-	_,err:=os.Stat(c.path)
+	fi,err:=os.Stat(c.path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			fmt.Printf("%s file does not exist\n",c.path)
 			return
 		}
 	}
-	c.ParseXml()
+	if fi.IsDir() {
+		c.isDir = true
+		c.ParseDir()
+	} else {
+		c.ParseXml(c.path)
+	}
 }
 
 func (c *Core) Run() {

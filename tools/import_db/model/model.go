@@ -29,7 +29,7 @@ type VulInfo struct {
 	Severity		string			`gorm:"column:severity;type:varchar(255)"`
 	VulnType		string			`gorm:"column:vuln-type;type:varchar(255)"`
 	VulnDescript 	string			`gorm:"column:vuln-descript;type:text"`
-	CveId			string			`gorm:"column:cve-id;type:varchar(255);unique_index"`
+	CveId			string			`gorm:"column:cve-id;not null;type:varchar(255);uniqueIndex"`
 	BugtraqId		string			`gorm:"column:bugtraq-id;type:varchar(255)"`
 	VulnSolution	string			`gorm:"column:vuln-solution;type:text"`
 }

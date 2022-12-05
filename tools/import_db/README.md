@@ -14,6 +14,12 @@
 
 --second    多久写入一条数据，例如：--second=10,每10秒写入一条数据，非必填参数，默认为0
 
-**导入数据示例**
+**导入数据**
+
+--path 支持文件路径例子：
 
 ./import_db --path=./655e3f39-3a52-41d9-bd21-21ea994b75aa.xml --go_num=10 --second=2
+
+--path 支持包含xml文件的目录：
+
+./import_db --path=./  --go_num=10 --second=2
