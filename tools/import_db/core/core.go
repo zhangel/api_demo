@@ -5,25 +5,26 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
-	"github.com/zhangel/logger"
 	"github.com/zhangel/gpool"
-	"gorm.io/gorm"
+	"github.com/zhangel/logger"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 	"tip/tools/import_db/model"
 	"tip/utils/mysql"
-	"time"
+	"tip/utils/sql_parse"
 )
 
 type Core struct {
-	DB *gorm.DB
 	path string
 	second  int
 	goNum 	int
 	isDir   bool
 	fileList []string
+	parseSQL *sql_parse.SqlParse
+	MySQL *mysql.MySQL
 }
 
 var (
@@ -43,11 +44,11 @@ func NewCore(URL string) *Core {
 }
 
 func (c *Core) createTable() {
-	if !c.DB.Migrator().HasTable(&model.VulInfo{}) {
-		c.DB.Migrator().CreateTable(&model.VulInfo{})
-	} else {
-		//logger.Warn("vul_infos already exists")
-	}
+	//if !c.DB.Migrator().HasTable(&model.VulInfo{}) {
+	//	c.DB.Migrator().CreateTable(&model.VulInfo{})
+	//} else {
+	//	//logger.Warn("vul_infos already exists")
+	//}
 }
 
 func (c *Core) CheckIsDir() {
@@ -55,9 +56,11 @@ func (c *Core) CheckIsDir() {
 }
 
 func (c *Core) init(URL string) {
-	conn :=mysql.NewMySQL(URL)
-	c.DB = conn.DB
-	c.createTable()
+	//conn :=mysql.NewMySQL(URL)
+	//c.DB = conn.DB
+	c.MySQL = mysql.NewMySQL(URL)
+	//c.createTable()
+	c.parseSQL = sql_parse.NewSqlParse()
 	c.Parse()
 
 }
@@ -84,20 +87,37 @@ func (c *Core) ReplaceXML(respByte []byte) string {
 }
 
 func (c *Core) WriteRecord(item model.Entry) {
-	insert:=model.VulInfo{
-		Name:item.Name,
-		VulnID:item.VulnId,
-		Published:item.Published,
-		Modified:item.Modified,
-		Source:item.Source,
-		Severity:item.Severity,
-		VulnType:item.VulnType,
-		VulnDescript:item.VulnDescript,
-		CveId:item.OtherId.CveId,
-		BugtraqId: item.OtherId.BugtraqId,
-		VulnSolution:item.VulnSolution,
+	//insert:=model.VulInfo{
+	//	Name:item.Name,
+	//	VulnID:item.VulnId,
+	//	Published:item.Published,
+	//	Modified:item.Modified,
+	//	Source:item.Source,
+	//	Severity:item.Severity,
+	//	VulnType:item.VulnType,
+	//	VulnDescript:item.VulnDescript,
+	//	CveId:item.OtherId.CveId,
+	//	BugtraqId: item.OtherId.BugtraqId,
+	//	VulnSolution:item.VulnSolution,
+	//}
+	insertMap:=make(map[string]interface{})
+	insertMap["name"] = item.Name
+	insertMap["vuln-id"] = item.VulnId
+	insertMap["published"] = item.Published
+	insertMap["modified"] = item.Modified
+	insertMap["source"] = item.Source
+	insertMap["severity"] = item.Severity
+	insertMap["vuln-type"] = item.VulnType
+	insertMap["vuln-descript"] = item.VulnDescript
+	insertMap["cve-id"] = item.OtherId.CveId
+	insertMap["bugtraq-id"] = item.OtherId.BugtraqId
+	insertMap["vuln-solution"] = item.VulnSolution
+	sqlInsert:=c.parseSQL.Table(tableName).Insert(insertMap)
+	//c.DB.Table()
+	db:=c.MySQL.DB.Exec(sqlInsert)
+	if db.Error != nil {
+		logger.Error("insert sql fail,error=%+v",db.Error)
 	}
-	c.DB.Create(&insert)
 }
 
 func (c *Core) Timer() {
