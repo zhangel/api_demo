@@ -20,18 +20,17 @@ type User struct {
 */
 
 type VulInfo struct {
-	Id 				int				`gorm:"primaryKey;type:int"`
-	Name 			string			`gorm:"column:name;type:varchar(255)"`
-	VulnID 			string			`gorm:"column:vuln-id;type:varchar(255)"`
-	Published		string			`gorm:"column:published;type:date"`
-	Modified		string			`gorm:"column:modified;type:date"`
-	Source 			string			`gorm:"column:source;type:varchar(200)"`
-	Severity		string			`gorm:"column:severity;type:varchar(255)"`
-	VulnType		string			`gorm:"column:vuln-type;type:varchar(255)"`
-	VulnDescript 	string			`gorm:"column:vuln-descript;type:text"`
-	CveId			string			`gorm:"column:cve-id;not null;type:varchar(255);uniqueIndex"`
-	BugtraqId		string			`gorm:"column:bugtraq-id;type:varchar(255)"`
-	VulnSolution	string			`gorm:"column:vuln-solution;type:text"`
+	Name 			string			`gorm:"column:name;type:varchar(255)" json:"name"`
+	VulnID 			string			`gorm:"column:vuln-id;type:varchar(255)" json:"vuln-id"`
+	Published		string			`gorm:"column:published;type:date" json:"published"`
+	Modified		string			`gorm:"column:modified;type:date" json:"modified"`
+	Source 			string			`gorm:"column:source;type:varchar(200)" json:"source"`
+	Severity		string			`gorm:"column:severity;type:varchar(255)" json:"severity"`
+	VulnType		string			`gorm:"column:vuln-type;type:varchar(255) json:"vuln-type"`
+	VulnDescript 	string			`gorm:"column:vuln-descript;type:text" json:"vuln-descript"`
+	CveId			string			`gorm:"column:cve-id;not null;type:varchar(255);uniqueIndex" json:"cve-id"`
+	BugtraqId		string			`gorm:"column:bugtraq-id;type:varchar(255)" json:"bugtraq-id"`
+	VulnSolution	string			`gorm:"column:vuln-solution;type:text" json:"vuln-solution"`
 }
 
 //xml structure

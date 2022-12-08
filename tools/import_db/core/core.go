@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -14,16 +15,18 @@ import (
 	"time"
 	"tip/tools/import_db/model"
 	"tip/utils/mysql"
-	"tip/utils/sql_parse"
 )
 
 type Core struct {
-	path string
+	src string
+	dest string
+	fileType string
 	second  int
 	goNum 	int
 	isDir   bool
-	fileList []string
-	parseSQL *sql_parse.SqlParse
+	fileList map[string][]string
+	lock 	sync.Mutex
+	fileSuffix []string
 	MySQL *mysql.MySQL
 }
 
@@ -31,52 +34,68 @@ var (
 	instance *Core
 	once sync.Once
 	src *string
-	tableName = "vul_infos"
-	fileSuffix = ".xml"
+	dest *string
+	fileType *string
+	processType map[string]func()
 )
 
-func NewCore(URL string) *Core {
+func NewCore() *Core {
 	once.Do(func() {
 		instance = new(Core)
-		instance.init(URL)
+		instance.init()
 	})
 	return instance
 }
 
-func (c *Core) createTable() {
-	//if !c.DB.Migrator().HasTable(&model.VulInfo{}) {
-	//	c.DB.Migrator().CreateTable(&model.VulInfo{})
-	//} else {
-	//	//logger.Warn("vul_infos already exists")
-	//}
+func (c *Core) PathExists(path string) (bool) {
+	_,err:=os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return false
 }
 
-func (c *Core) CheckIsDir() {
-
-}
-
-func (c *Core) init(URL string) {
-	//conn :=mysql.NewMySQL(URL)
-	//c.DB = conn.DB
-	c.MySQL = mysql.NewMySQL(URL)
-	//c.createTable()
-	c.parseSQL = sql_parse.NewSqlParse()
+func (c *Core) init() {
 	c.Parse()
-
+	processType =make(map[string]func())
+	processType["xml"] = c.XmlParse
+	processType["json"] = c.JsonParse
+	if !c.PathExists(c.dest) {
+		err:=os.Mkdir(c.dest,0777)
+		if err != nil {
+			logger.Fatal("create dest dir fail,error=%+v",err)
+		}
+	}
 }
 
 func (c *Core) Parse() {
-	src = flag.String("path","","Please enter the file path, for example: -- path=./xml_ file")
-	second:=flag.Int("second",0,"Please enter a few seconds to write a piece of data, for example: -- second=1, default is 0 seconds")
+	src = flag.String("src","","Please enter the source path, for example: --src=./src_dir")
+	dest = flag.String("dest","","Please enter the destination path, for example: --dest=./dest_dir")
+	fileType = flag.String("file_type","","Please enter the file type, for example: --file_type=xml,json")
+	second:=flag.Int("second",0,"Please enter a few seconds to write a piece of data, for example: --second=1, default is 0 seconds")
 	goNum:=flag.Int("go_num",1,"Please enter --go_num=, default to 1")
 	flag.Parse()
 	if *src == "" {
-		fmt.Println("please enter file path,example --path=./xml_file")
+		fmt.Println("please enter source path,example --src=./src_dir")
+		os.Exit(0)
+	}
+	if *fileType == "" {
+		fmt.Println("Please enter the file type, for example: --file_type=xml,json")
+		os.Exit(0)
+	}
+	if *dest == "" {
+		fmt.Println("Please enter the destination path, for example: --dest=./dest_dir")
 		os.Exit(0)
 	}
 	c.second = *second
-	c.path = *src
+	c.src= *src
+	c.dest = *dest
+	c.fileType = *fileType
 	c.goNum = *goNum
+	c.fileSuffix = strings.Split(*fileType,",")
 }
 
 func (c *Core) ReplaceXML(respByte []byte) string {
@@ -86,38 +105,22 @@ func (c *Core) ReplaceXML(respByte []byte) string {
 	return respStr
 }
 
-func (c *Core) WriteRecord(item model.Entry) {
-	//insert:=model.VulInfo{
-	//	Name:item.Name,
-	//	VulnID:item.VulnId,
-	//	Published:item.Published,
-	//	Modified:item.Modified,
-	//	Source:item.Source,
-	//	Severity:item.Severity,
-	//	VulnType:item.VulnType,
-	//	VulnDescript:item.VulnDescript,
-	//	CveId:item.OtherId.CveId,
-	//	BugtraqId: item.OtherId.BugtraqId,
-	//	VulnSolution:item.VulnSolution,
-	//}
-	insertMap:=make(map[string]interface{})
-	insertMap["name"] = item.Name
-	insertMap["vuln-id"] = item.VulnId
-	insertMap["published"] = item.Published
-	insertMap["modified"] = item.Modified
-	insertMap["source"] = item.Source
-	insertMap["severity"] = item.Severity
-	insertMap["vuln-type"] = item.VulnType
-	insertMap["vuln-descript"] = item.VulnDescript
-	insertMap["cve-id"] = item.OtherId.CveId
-	insertMap["bugtraq-id"] = item.OtherId.BugtraqId
-	insertMap["vuln-solution"] = item.VulnSolution
-	sqlInsert:=c.parseSQL.Table(tableName).Insert(insertMap)
-	//c.DB.Table()
-	db:=c.MySQL.DB.Exec(sqlInsert)
-	if db.Error != nil {
-		logger.Error("insert sql fail,error=%+v",db.Error)
+func (c *Core) WriteRecord(item model.Entry,f *os.File) {
+	fields:=[]string{
+		item.Name,
+		item.VulnId,
+		item.Published,
+		item.Modified,
+		item.Source,
+		item.Severity,
+		item.VulnType,
+		item.VulnDescript,
+		item.OtherId.CveId,
+		item.OtherId.BugtraqId,
+		item.VulnSolution,
 	}
+	writeString:=strings.Join(fields,"|")
+	f.WriteString(writeString+"\n")
 }
 
 func (c *Core) Timer() {
@@ -142,41 +145,89 @@ func (c *Core) ParseXml(path string) {
 		return
 	}
 	g:=gpool.New(c.goNum)
+	csvFileName:= strings.Replace(path,".xml",".csv",-1)
+	csvFileName=filepath.Join(c.dest,csvFileName)
+	f,err:= os.OpenFile(csvFileName,os.O_RDWR|os.O_CREATE,0777)
+	if err != nil {
+		logger.Fatal("open csv file fail,error=%+v",err)
+	}
+	defer f.Close()
 	for _,item:=range Cnnvd.Entries {
 		c.Timer()
 		g.Add(1)
 		go func() {
 			defer g.Done()
-			c.WriteRecord(item)
+			c.WriteRecord(item,f)
 		}()
 	}
 	g.Wait()
 }
+func (c *Core) XmlParse() {
+	for _,item:=range c.fileList["xml"] {
+		c.ParseXml(item)
+	}
+}
+
+func (c *Core) JsonProcess(src string) {
+	resp,err:=os.ReadFile(src)
+	if err != nil {
+		logger.Fatal("read json file %s fail,error=%+v",src,err)
+	}
+	exploit:=make(map[string][]string)
+	err=json.Unmarshal(resp,&exploit)
+	if err != nil {
+		logger.Fatal("unmarshal file %s fail,error=%+v",src,err)
+	}
+	csvFileName:=strings.Replace(src,".json",".csv",-1)
+	csvFileName=filepath.Join(c.dest,csvFileName)
+	f,err:=os.OpenFile(csvFileName,os.O_RDWR|os.O_CREATE,0777)
+	if err != nil {
+		logger.Fatal("create csv file %s fail,error=%+v",csvFileName,err)
+	}
+	defer f.Close()
+	for key,list:=range exploit {
+		for _,item:=range list {
+			writeStr:=fmt.Sprintf("%s\t%s\n",key,item)
+			f.WriteString(writeStr)
+		}
+	}
+}
+
+func (c *Core) JsonParse() {
+	for _,item:=range c.fileList["json"] {
+		c.JsonProcess(item)
+	}
+}
 
 func (c *Core) ScanDir() {
-	entry,err:=os.ReadDir(c.path)
+	entry,err:=os.ReadDir(c.src)
 	if err != nil {
-		logger.Error("scan dir %s fail,error=%+v",c.path,err)
+		logger.Error("scan dir %s fail,error=%+v",c.src,err)
 		return
 	}
 	if len(entry) ==0 {
-		logger.Error("%s entry is empty",c.path)
+		logger.Error("%s entry is empty",c.src)
 		return
 	}
-	xmlEntry:=make([]string,0)
+	xmlEntry:=make(map[string][]string)
 	for _,file:=range entry {
 		suffix:=filepath.Ext(file.Name())
-		if !file.IsDir() && suffix == fileSuffix {
-			xmlFile:=filepath.Join(c.path,file.Name())
-			xmlEntry=append(xmlEntry,xmlFile)
+		for _,fType := range c.fileSuffix {
+			fileSuffix:=fmt.Sprintf(".%s",fType)
+			if suffix == fileSuffix {
+				xmlFile:=filepath.Join(c.src,file.Name())
+				xmlEntry[fType] = append(xmlEntry[fType],xmlFile)
+			}
 		}
 	}
 	c.fileList = xmlEntry
 }
 
 func (c *Core) importData() {
-	for _,file:=range c.fileList {
-		c.ParseXml(file)
+	for _type,_:=range c.fileList {
+		if _, ok:= processType[_type]; ok {
+			processType[_type]()
+		}
 	}
 }
 
@@ -186,10 +237,10 @@ func (c *Core) ParseDir() {
 }
 
 func (c *Core) ReadXml() {
-	fi,err:=os.Stat(c.path)
+	fi,err:=os.Stat(c.src)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Printf("%s file does not exist\n",c.path)
+			fmt.Printf("%s file does not exist\n",c.src)
 			return
 		}
 	}
@@ -197,7 +248,7 @@ func (c *Core) ReadXml() {
 		c.isDir = true
 		c.ParseDir()
 	} else {
-		c.ParseXml(c.path)
+		c.ParseXml(c.src)
 	}
 }
 

@@ -17,6 +17,6 @@ func String(key string) string {
 }
 
 func main() {
-	c:=core.NewCore(String("db"))
+	c:=core.NewCore()
 	c.Run()
 }
