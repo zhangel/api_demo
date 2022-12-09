@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"flag"
 	"fmt"
+	"github.com/spf13/cobra"
 	"github.com/zhangel/gpool"
 	"github.com/zhangel/logger"
 	"os"
@@ -28,14 +28,19 @@ type Core struct {
 	lock 	sync.Mutex
 	fileSuffix []string
 	MySQL *mysql.MySQL
+	RootCmd *cobra.Command
+	ConvertCmd	*cobra.Command
+	ImportCmd  *cobra.Command
 }
 
 var (
 	instance *Core
 	once sync.Once
-	src *string
-	dest *string
-	fileType *string
+	src string
+	dest string
+	fileType string
+	second int
+	go_num int
 	processType map[string]func()
 )
 
@@ -59,43 +64,18 @@ func (c *Core) PathExists(path string) (bool) {
 }
 
 func (c *Core) init() {
-	c.Parse()
 	processType =make(map[string]func())
 	processType["xml"] = c.XmlParse
 	processType["json"] = c.JsonParse
-	if !c.PathExists(c.dest) {
-		err:=os.Mkdir(c.dest,0777)
-		if err != nil {
-			logger.Fatal("create dest dir fail,error=%+v",err)
-		}
-	}
 }
 
 func (c *Core) Parse() {
-	src = flag.String("src","","Please enter the source path, for example: --src=./src_dir")
-	dest = flag.String("dest","","Please enter the destination path, for example: --dest=./dest_dir")
-	fileType = flag.String("file_type","","Please enter the file type, for example: --file_type=xml,json")
-	second:=flag.Int("second",0,"Please enter a few seconds to write a piece of data, for example: --second=1, default is 0 seconds")
-	goNum:=flag.Int("go_num",1,"Please enter --go_num=, default to 1")
-	flag.Parse()
-	if *src == "" {
-		fmt.Println("please enter source path,example --src=./src_dir")
-		os.Exit(0)
-	}
-	if *fileType == "" {
-		fmt.Println("Please enter the file type, for example: --file_type=xml,json")
-		os.Exit(0)
-	}
-	if *dest == "" {
-		fmt.Println("Please enter the destination path, for example: --dest=./dest_dir")
-		os.Exit(0)
-	}
-	c.second = *second
-	c.src= *src
-	c.dest = *dest
-	c.fileType = *fileType
-	c.goNum = *goNum
-	c.fileSuffix = strings.Split(*fileType,",")
+	c.RootCmd = &cobra.Command{Use: "import_db"}
+	c.Convert()
+	//c.Import()
+	c.RootCmd.AddCommand(c.ConvertCmd)
+	//c.RootCmd.AddCommand(c.ImportCmd)
+	c.RootCmd.Execute()
 }
 
 func (c *Core) ReplaceXML(respByte []byte) string {
@@ -105,19 +85,29 @@ func (c *Core) ReplaceXML(respByte []byte) string {
 	return respStr
 }
 
+func (c *Core) GetValue(value string) string {
+	if value == "" {
+		value = " "
+	}
+	return value
+}
+
 func (c *Core) WriteRecord(item model.Entry,f *os.File) {
 	fields:=[]string{
-		item.Name,
-		item.VulnId,
-		item.Published,
-		item.Modified,
-		item.Source,
-		item.Severity,
-		item.VulnType,
-		item.VulnDescript,
-		item.OtherId.CveId,
-		item.OtherId.BugtraqId,
-		item.VulnSolution,
+		c.GetValue(item.Name),
+		c.GetValue(item.VulnId),
+		c.GetValue(item.Published),
+		c.GetValue(item.Modified),
+		c.GetValue(item.Source),
+		c.GetValue(item.Severity),
+		c.GetValue(item.VulnType),
+		c.GetValue(item.VulnDescript),
+		c.GetValue(item.OtherId.CveId),
+		c.GetValue(item.OtherId.BugtraqId),
+		c.GetValue(item.VulnSolution),
+	}
+	for i:=0;i<6;i++{
+		fields=append(fields," ")
 	}
 	writeString:=strings.Join(fields,"|")
 	f.WriteString(writeString+"\n")
@@ -253,5 +243,69 @@ func (c *Core) ReadXml() {
 }
 
 func (c *Core) Run() {
-	c.ReadXml()
+	c.Parse()
+}
+
+func (c *Core) ConvertData(cmd *cobra.Command,args []string) {
+	//参数接收
+	c.ConvertArgs()
+	c.ParseDir()
+
+}
+
+func (c *Core) ConvertArgs() {
+
+	if fileType == "" {
+		fmt.Println("Please enter the file type, for example: --file_type=xml,json")
+		os.Exit(0)
+	}
+	if dest == "" {
+		fmt.Println("Please enter the destination path, for example: --dest=./dest_dir")
+		os.Exit(0)
+	}
+	if src == "" {
+		fmt.Println("Please enter the source path, for example: --src=./src_dir")
+		os.Exit(0)
+	}
+	c.second = second
+	c.src= src
+	c.dest = dest
+	c.fileType = fileType
+	c.goNum = go_num
+	c.fileSuffix = strings.Split(fileType,",")
+	if !c.PathExists(c.dest) {
+		err:=os.Mkdir(c.dest,0777)
+		if err != nil {
+			logger.Fatal("create dest dir fail,error=%+v",err)
+		}
+	}
+}
+
+func (c *Core) ImportData(cmd *cobra.Command,args []string) {
+
+}
+
+func (c *Core) Import() {
+	c.ImportCmd = &cobra.Command{
+		Use: "import",
+		Short: "csv file import to starrocks db",
+		Long: "csv file import to starrocks database table",
+		Run: c.ImportData,
+	}
+
+}
+
+func (c *Core) Convert() {
+	c.ConvertCmd = &cobra.Command{
+		Use: "convert",
+ 		Short: "xml,json convert to csv file",
+ 		Long: "from xml,json file to csv file",
+ 		Run:c.ConvertData,
+	}
+	c.ConvertCmd.Flags().StringVarP(&src, "src", "c", "","Please enter the source path, for example: --src=./src_dir")
+	c.ConvertCmd.Flags().StringVarP(&dest, "dest", "d", "","Please enter the destination path, for example: --dest=./dest_dir")
+	c.ConvertCmd.Flags().StringVarP(&fileType, "file_type", "f", "","Please enter the file type, for example: --file_type=xml,json")
+	c.ConvertCmd.Flags().IntVarP(&second, "second", "s", 0,"Please enter a few seconds to write a piece of data, for example: --second=1, default is 0 seconds")
+	c.ConvertCmd.Flags().IntVarP(&go_num, "go_num", "g", 1,"Please enter --go_num=, default to 1")
+
 }

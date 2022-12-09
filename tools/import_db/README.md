@@ -1,8 +1,8 @@
-# convert  tools
+# import_db 
 
 ### 1、XML 、json format file to csv
 
-命令名称：		convert
+命令名称：		import_db convert
 
 原始文件类型： XML、JSON
 
@@ -20,6 +20,6 @@
 
 **转换示例**
 
-./convert --src=./ --dest=./aaa --file_type=xml,json
+./import_db convert --src=./ --dest=./ --file_type=xml,json
 
 以上命令会将./目录下的xml、json格式文件转成csv文件，转存到aaa目录下，如果该目录不存在会创建。
